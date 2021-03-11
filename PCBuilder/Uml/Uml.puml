@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class PCPart
+{
+    + string Name
+    + bool IsSuppliesPower
+    + int Power
+    + bool IsAbsorbHeat
+    + int Temperature
+}
+
+class Cpu
+class Ram
+class PowerSupplier
+class HeatSink
+
+PCPart <|-- Cpu
+PCPart <|-- Ram
+PCPart <|-- PowerSupplier
+PCPart <|-- HeatSink
+
+class Pc
+{
+    - IList<PCPart> _parts
+    + void BuildPcParts()
+    + void SetValuePart(PCPart part)
+    - bool IsPowerBalance() 
+    + bool IsTemperatureBalance()
+    + void PrintPcSpecification()
+}
+
+class Builder
+{
+    + Pc _pc
+    - void Reset()
+    + void BuildPc()
+    + Pc GetPc()
+}
+
+class Director
+{
+    + IBuilder Builder
+    + void BuildComputer()
+}
+
+interface IBuilder
+{
+    void BuildPc();
+    Pc GetPc();
+}
+
+IBuilder <|.. Builder
+Pc <.. Builder
+Director *-- IBuilder
+Pc --o PCPart
+
+@enduml

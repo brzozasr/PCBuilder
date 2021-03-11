@@ -51,23 +51,27 @@ namespace PCBuilder.PCs
 
         private void SetValuePart(PCPart part)
         {
+            int[] randPower = new[] {50, 100, 150, 200, 250, 300, 350};
+            int[] randTemperature = new[] {50, 100, 150, 200, 250, 300, 350};
+            int randEnv = Utils.Random.Next(0, randPower.Length);
+            
             if (part is Cpu cpu)
             {
                 int randCpu = Utils.Random.Next(0, Enum.GetNames(typeof(CpuList)).Length);
                 part.Name = ((CpuList) randCpu).GetDescription();
                 part.IsSuppliesPower = false;
-                part.Power = 250;
+                part.Power = randPower[randEnv];
                 part.IsAbsorbHeat = false;
-                part.Temperature = 120;
+                part.Temperature = randTemperature[randEnv];
             }
             else if (part is Ram ram)
             {
                 int randRam = Utils.Random.Next(0, Enum.GetNames(typeof(RamList)).Length);
                 part.Name = ((RamList) randRam).GetDescription();
                 part.IsSuppliesPower = false;
-                part.Power = 150;
+                part.Power = randPower[randEnv];
                 part.IsAbsorbHeat = false;
-                part.Temperature = 100;
+                part.Temperature = randTemperature[randEnv];;
             }
             else if (part is PowerSupplier powerSupplier)
             {
@@ -85,7 +89,7 @@ namespace PCBuilder.PCs
                 part.IsSuppliesPower = true;
                 part.Power = power[randInt];
                 part.IsAbsorbHeat = false;
-                part.Temperature = 150;
+                part.Temperature = randTemperature[randEnv];;
             }
             else if (part is HeatSink heatSink)
             {
@@ -101,34 +105,72 @@ namespace PCBuilder.PCs
 
                 part.Name = ((HeatSinkList) temperature[randInt]).GetDescription();
                 part.IsSuppliesPower = false;
-                part.Power = 80;
+                part.Power = randPower[randEnv];
                 part.IsAbsorbHeat = true;
                 part.Temperature = temperature[randInt];
             }
         }
 
-        public bool PowerBalance()
+        private bool IsPowerBalance()
         {
-            throw new NotImplementedException();
+            var powerIn = _parts.Where(ps => ps is PowerSupplier && ps.IsSuppliesPower).Sum(ps => ps.Power);
+            var powerSum = _parts.Where(p => p.IsSuppliesPower == false).Sum(p => p.Power);
+            
+            Console.WriteLine($"Supplies power: {powerIn}, draws power: {powerSum}");
+
+            if (powerIn >= powerSum)
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public int TemperatureBalance()
+        public bool IsTemperatureBalance()
         {
-            throw new NotImplementedException();
+            int maxTemperature = 100;
+            
+            var absorbHeat = _parts.Where(h => h.IsAbsorbHeat).Sum(h => h.Temperature);
+            var emitHeat = _parts.Where(p => p.IsAbsorbHeat == false).Sum(p => p.Temperature);
+
+            var cooledTemperature = emitHeat - absorbHeat;
+
+            Console.WriteLine($"Max heat: {maxTemperature}, heat after cooling: {emitHeat - absorbHeat}, emit heat: {emitHeat}, absorb: {absorbHeat}");
+
+            if (cooledTemperature < maxTemperature)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public void PrintPcSpecification()
         {
-            StringBuilder sb = new StringBuilder();
+            var powerBalance = IsPowerBalance();
+            var temperatureBalance = IsTemperatureBalance();
 
-            sb.AppendLine("== PC SET ==");
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("==== PC SET ====");
             foreach (var part in _parts)
             {
                 sb.AppendLine(
                     $"{part.GetType().Name}: {part.Name}, IsSuppliesPower: {part.IsSuppliesPower}, Power: {part.Power}, IsAbsorbHeat: {part.IsAbsorbHeat}, Temperature: {part.Temperature}");
             }
 
-            sb.AppendLine("======================================");
+            sb.AppendLine($"The balance of power is {powerBalance}");
+            sb.AppendLine($"The balance of temperature is {temperatureBalance}");
+
+            if (powerBalance && temperatureBalance)
+            {
+                sb.AppendLine($"The computer is running.");
+            }
+            else
+            {
+                sb.AppendLine($"The computer is no running.");
+            }
+            
+            sb.AppendLine("==========================================================");
 
             Console.Write(sb.ToString());
         }
