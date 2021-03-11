@@ -1,4 +1,4 @@
-﻿using System;
+﻿using PCBuilder.Builder;
 
 namespace PCBuilder
 {
@@ -6,7 +6,18 @@ namespace PCBuilder
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            // Pc pc = new Pc();
+            // pc.BuildPcParts();
+            // pc.PrintPcSpecification();
+
+            var director = new Director();
+            var builder = new Builder.Builder();
+
+            director.Builder = builder;
+            
+            director.BuildComputer();
+            
+            builder.GetPc().PrintPcSpecification();
         }
     }
 }
