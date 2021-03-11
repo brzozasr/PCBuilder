@@ -53,6 +53,6 @@ interface IBuilder
 IBuilder <|.. Builder
 Pc <.. Builder
 Director *-- IBuilder
-Pc --o PCPart
+Pc o-- PCPart
 
 @enduml
