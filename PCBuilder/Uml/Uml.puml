@@ -26,7 +26,7 @@ class Pc
     + void BuildPcParts()
     + void SetValuePart(PCPart part)
     - bool IsPowerBalance() 
-    + bool IsTemperatureBalance()
+    - bool IsTemperatureBalance()
     + void PrintPcSpecification()
 }
 

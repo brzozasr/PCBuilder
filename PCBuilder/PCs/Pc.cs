@@ -126,7 +126,7 @@ namespace PCBuilder.PCs
             return false;
         }
 
-        public bool IsTemperatureBalance()
+        private bool IsTemperatureBalance()
         {
             int maxTemperature = 100;
             
